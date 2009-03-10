@@ -16,34 +16,39 @@ class Fleet {
 			throw new Exception("id was not an int.");
 		}
 		
-		$assoc = DataManger::QueryAndFetch("SELECT * FROM Fleet WHERE id = " . $id);
+		$assoc = DataManger::QueryAndFetch("SELECT * FROM fleet WHERE id = " . $id);
 		if (!$assoc) {
 			throw new Exception('Fleet not found.');
 		}
 		
 		$f = new Fleet();
-		fillFleet($f, $assoc);
+		fill($f, $assoc);
 	}
 	
-	private static function fillFleet(&$f, &$assoc) {
+	// fills a Fleet object with data from a call to mysql_fetch_assoc.
+	private static function fill(&$f, &$assoc) {
 		$f->Id = $assoc['id'];
 		$f->AllianceId = $assoc['allianceId'];
 		$f->Name = $assoc['name'];
 		$f->Added = $assoc['added'];
 		$f->inDatabase = 1;
 	}
-	
+
+	// Returns array contain all the Fleets.
 	public static function GetAll() {
 		$query = DataManager::Query("SELECT * FROM fleet");
 		$items = array();
 		while ($assoc = mysql_fetch_assoc($query)) {
 			$f = new Fleet();
-			Fleet::fillFleet($f, $assoc);
+			Fleet::fill($f, $assoc);
 			$items[] = $f;
 		}
 		return $items;
 	}
 	
+	// Returns TRUE if the Fleet record was added or updated in
+	// the database, FALSE otherwise.
+	// Update not implemented yet.
 	public function Save() {
 		if (!$this->Validate())
 			return FALSE;
@@ -55,7 +60,12 @@ class Fleet {
 			date_default_timezone_set('UTC');
 			$sql .= '"' . date('Y-m-d H:i:s', $this->Added) . '")';
 			DataManager::Query($sql);
-			return (mysql_affected_rows() === 1);
+			if (mysql_affected_rows() === 1) {
+				$this->inDatabase = 1;
+				return TRUE;
+			}
+			else
+				return FALSE;
 		}
 		return FALSE;
 	}
