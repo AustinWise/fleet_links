@@ -15,22 +15,31 @@ class Fleet {
 		if (!is_int($id)) {
 			throw new Exception("id was not an int.");
 		}
+
+		$conn = DataManager::GetConnection();
+		$stmt = $conn->prepare('SELECT id, allianceid, name, added FROM fleet WHERE id = ?');
+		$stmt->bind_param('i', $id);
+		$stmt->execute();
+		$stmt->bind_result($id, $allianceId, $name, $added);
 		
-		$assoc = DataManger::QueryAndFetch("SELECT * FROM fleet WHERE id = " . $id);
-		if (!$assoc) {
-			throw new Exception('Fleet not found.');
+		if (!$stmt->fetch()) {
+			throw new Exception("Alliance not found.");
 		}
-		
+
 		$f = new Fleet();
-		fill($f, $assoc);
+		Fleet::fill($f, $id, $allianceId, $name, $added);
+
+		$stmt->close();
+		
+		return $f;
 	}
 	
-	// fills a Fleet object with data from a call to mysql_fetch_assoc.
-	private static function fill(&$f, &$assoc) {
-		$f->Id = $assoc['id'];
-		$f->AllianceId = $assoc['allianceId'];
-		$f->Name = $assoc['name'];
-		$f->Added = $assoc['added'];
+	// fills a Fleet object with data from mysql
+	private static function fill(&$f, $id, $allianceId, $name, $added) {
+		$f->Id = (int)$id;
+		$f->AllianceId = (int)$allianceId;
+		$f->Name = $name;
+		$f->Added = strtotime($added);
 		$f->inDatabase = 1;
 	}
 
@@ -38,32 +47,87 @@ class Fleet {
 	public static function GetAll() {
 		$query = DataManager::Query("SELECT * FROM fleet");
 		$items = array();
-		while ($assoc = mysql_fetch_assoc($query)) {
+		while ($assoc = $query->fetch_assoc()) {
 			$f = new Fleet();
-			Fleet::fill($f, $assoc);
+			Fleet::fill($f, $assoc['id'], $assoc['allianceId'], $assoc['name'], $assoc['added']);
 			$items[] = $f;
 		}
+		$query->close();
 		return $items;
 	}
 	
+	public static function GetFleetsForAlliance($allianceId) {
+		if (!is_int($allianceId)) {
+			throw new Exception("allianceId was not an int.");
+		}
+		
+		$conn = DataManager::GetConnection();
+		$stmt = $conn->prepare('SELECT id, allianceid, name, added FROM fleet WHERE added > ? AND allianceid = ?');
+		$stmt->bind_param('si', DataManager::FormatTimestampForSql(LastDowntimeMidpoint()), $allianceId);
+		$stmt->execute();
+		$stmt->bind_result($id, $allianceId, $name, $added);
+		
+		$fleets = array();
+		while ($stmt->fetch()) {
+			$f = new Fleet();
+			Fleet::fill($f, $id, $allianceId, $name, $added);
+			$fleets[] = $f;
+		}
+
+		$stmt->close();
+
+		return $fleets;
+	}
+	
+	public static function DeleteOldFleets() {
+		$conn = DataManager::GetConnection();
+		$stmt = $conn->prepare('DELETE fleet WHERE added < ?');
+		$stmt->bind_param('s', DataManager::FormatTimestampForSql(LastDowntimeMidpoint()));
+		$stmt->execute();
+		$stmt->close();
+	}
+	
+	public static function DeleteFleet($id) {
+		if (!is_int($id)) {
+			throw new Exception("id was not an int.");
+		}
+
+		$conn = DataManager::GetConnection();
+		$stmt = $conn->prepare('DELETE fleet WHERE id = ?');
+		$stmt->bind_param('i', $id);
+		$stmt->execute();
+		$stmt->close();
+	}
+
+
 	// Returns TRUE if the Fleet record was added or updated in
 	// the database, FALSE otherwise.
 	// Update not implemented yet.
 	public function Save() {
 		if (!$this->Validate())
-			return FALSE;
+			throw new Exception('Fleet not valid; unable to save.');
+		$conn = DataManager::GetConnection();
 		if ($this->inDatabase == 0) {
-			$sql = 'INSERT INTO fleet (id, allianceId, name, added) VALUES (';
-			$sql .= (string)$this->Id . ', ';
-			$sql .= (string)$this->AllianceId . ', ';
-			$sql .= '"' . DataManager::EscapeString($this->Name) . '", ';
-			date_default_timezone_set('UTC');
-			$sql .= '"' . date('Y-m-d H:i:s', $this->Added) . '")';
-			DataManager::Query($sql);
-			if (mysql_affected_rows() === 1) {
+			$stmt = $conn->prepare('INSERT INTO fleet (id, allianceId, name, added) VALUES (?, ?, ?, ?)');
+			$stmt->bind_param('iiss', $this->Id, $this->AllianceId, $this->Name, DataManager::FormatTimestampForSql($this->Added));
+			$stmt->execute();
+			$rows = $stmt->affected_rows;
+			$stmt->close();
+			if ($rows === 1) {
 				$this->inDatabase = 1;
 				return TRUE;
 			}
+			else
+				return FALSE;
+		}
+		else {
+			$stmt = $conn->prepare('UPDATE fleet SET allianceId=?, name=?, added=? WHERE id=?');
+			$stmt->bind_param('issi', $this->AllianceId, $this->Name, DataManager::FormatTimestampForSql($this->Added), $this->Id);
+			$stmt->execute();
+			$rows = $stmt->affected_rows;
+			$stmt->close();
+			if ($rows === 1)
+				return TRUE;
 			else
 				return FALSE;
 		}
@@ -81,7 +145,7 @@ class Fleet {
 			return FALSE;
 		if (isset($this->Name) && is_string($this->Name)) {
 			$strlen = strlen($this->Name);
-			if ($strlen == 0 || $strlen > 50)
+			if ($strlen < 1 || $strlen > 50)
 				return FALSE;
 		}
 		else {

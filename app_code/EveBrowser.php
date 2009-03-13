@@ -15,55 +15,60 @@ class EveBrowser implements IEveBrowser {
    }
 
    public function RegionName() {
-      return $_SERVER['HTTP_EVE_REGIONNAME'];
+      return EveBrowser::getHeader('HTTP_EVE_REGIONNAME');
    }
 
    public function ConstellationName() {
-      return $_SERVER['HTTP_EVE_CONSTELLATIONNAME'];
+      return EveBrowser::getHeader('HTTP_EVE_CONSTELLATIONNAME');
    }
 
    public function SolarSystemName() {
-      return $_SERVER['HTTP_EVE_SOLARSYSTEMNAME'];
+      return EveBrowser::getHeader('HTTP_EVE_SOLARSYSTEMNAME');
    }
 
    public function AllianceID() {
-      return (int)$_SERVER['HTTP_EVE_ALLIANCEID'];
+      return (int)EveBrowser::getHeader('HTTP_EVE_ALLIANCEID');
    }
 
    public function AllianceName() {
-      return $_SERVER['HTTP_EVE_ALLIANCENAME'];
+      return EveBrowser::getHeader('HTTP_EVE_ALLIANCENAME');
    }
 
    public function CharacterID() {
-      return (int)$_SERVER['HTTP_EVE_CHARID'];
+      return (int)EveBrowser::getHeader('HTTP_EVE_CHARID');
    }
 
    public function CharacterName() {
-      return $_SERVER['HTTP_EVE_CHARNAME'];
+      return EveBrowser::getHeader('HTTP_EVE_CHARNAME');
    }
 
    public function CorporationID() {
-      return (int)$_SERVER['HTTP_EVE_CORPID'];
+      return (int)EveBrowser::getHeader('HTTP_EVE_CORPID');
    }
 
    public function CorporationName() {
-      return $_SERVER['HTTP_EVE_CORPNAME'];
+      return EveBrowser::getHeader('HTTP_EVE_CORPNAME');
    }
 
    public function StationName() {
-      return $_SERVER['HTTP_EVE_STATIONNAME'];
+      return EveBrowser::getHeader('HTTP_EVE_STATIONNAME');
    }
 
    public function Server() {
-      return $_SERVER['HTTP_EVE_SERVERIP'];
+      return EveBrowser::getHeader('HTTP_EVE_SERVERIP');
    }
 
    public function CorporationRole() {
-      return (int)$_SERVER['HTTP_EVE_CORPROLE'];
+      return (int)EveBrowser::getHeader('HTTP_EVE_CORPROLE');
    }
 
    public function NearestLocation() {
-      return $_SERVER['HTTP_EVE_NEARESTLOCATION'];
+      return EveBrowser::getHeader('HTTP_EVE_NEARESTLOCATION');
+   }
+   
+   private function getHeader($name) {
+      $value = $_SERVER[$name];
+      return get_magic_quotes_gpc() ? stripslashes($value) : $value;
    }
 
 }
