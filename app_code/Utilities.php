@@ -14,4 +14,22 @@ function LastDowntimeMidpoint() {
 		return $midDowntime;
 	}
 }
+
+function RedirectResponse($path) {
+//	header('Location:http://' . GetServer('HTTP_HOST') . '/' . $path);
+	header('Location:' . $path);
+	die(302);
+}
+
+function GetGet($name) {
+	return get_magic_quotes_gpc() ? stripslashes($_GET[$name]) : $_GET[$name];
+}
+
+function GetPost($name) {
+	return get_magic_quotes_gpc() ? stripslashes($_POST[$name]) : $_POST[$name];
+}
+
+function GetServer($name) {
+	return get_magic_quotes_gpc() ? stripslashes($_SERVER[$name]) : $_SERVER[$name];
+}
 ?>

@@ -4,26 +4,27 @@ class Fleet {
 	function __construct() {
 	}
 	
+	//$Id is a float, as fleet ids are very large.
 	public $Id;
 	public $AllianceId;
 	public $Name;
 	public $Added;
 	
-	private $inDatabase = 0;
+	private $inDatabase = FALSE;
 	
 	public static function Get($id) {
-		if (!is_int($id)) {
+		if (!(is_float($id))) {
 			throw new Exception("id was not an int.");
 		}
 
 		$conn = DataManager::GetConnection();
 		$stmt = $conn->prepare('SELECT id, allianceid, name, added FROM fleet WHERE id = ?');
-		$stmt->bind_param('i', $id);
+		$stmt->bind_param('d', $id);
 		$stmt->execute();
 		$stmt->bind_result($id, $allianceId, $name, $added);
 		
 		if (!$stmt->fetch()) {
-			throw new Exception("Alliance not found.");
+			throw new Exception("Fleet not found.");
 		}
 
 		$f = new Fleet();
@@ -36,11 +37,11 @@ class Fleet {
 	
 	// fills a Fleet object with data from mysql
 	private static function fill(&$f, $id, $allianceId, $name, $added) {
-		$f->Id = (int)$id;
+		$f->Id = (float)$id;
 		$f->AllianceId = (int)$allianceId;
 		$f->Name = $name;
 		$f->Added = strtotime($added);
-		$f->inDatabase = 1;
+		$f->inDatabase = TRUE;
 	}
 
 	// Returns array contain all the Fleets.
@@ -88,17 +89,23 @@ class Fleet {
 	}
 	
 	public static function DeleteFleet($id) {
-		if (!is_int($id)) {
+		if (!is_float($id)) {
 			throw new Exception("id was not an int.");
 		}
 
 		$conn = DataManager::GetConnection();
-		$stmt = $conn->prepare('DELETE fleet WHERE id = ?');
-		$stmt->bind_param('i', $id);
+		$stmt = $conn->prepare('DELETE FROM fleet WHERE id = ?');
+		$stmt->bind_param('d', $id);
 		$stmt->execute();
 		$stmt->close();
 	}
 
+	public function Delete() {
+		if (!$this->inDatabase)
+			return;
+		Fleet::DeleteFleet($this->Id);
+		$this->inDatabase = FALSE;
+	}
 
 	// Returns TRUE if the Fleet record was added or updated in
 	// the database, FALSE otherwise.
@@ -107,14 +114,14 @@ class Fleet {
 		if (!$this->Validate())
 			throw new Exception('Fleet not valid; unable to save.');
 		$conn = DataManager::GetConnection();
-		if ($this->inDatabase == 0) {
+		if (!$this->inDatabase) {
 			$stmt = $conn->prepare('INSERT INTO fleet (id, allianceId, name, added) VALUES (?, ?, ?, ?)');
-			$stmt->bind_param('iiss', $this->Id, $this->AllianceId, $this->Name, DataManager::FormatTimestampForSql($this->Added));
+			$stmt->bind_param('diss', $this->Id, $this->AllianceId, $this->Name, DataManager::FormatTimestampForSql($this->Added));
 			$stmt->execute();
 			$rows = $stmt->affected_rows;
 			$stmt->close();
 			if ($rows === 1) {
-				$this->inDatabase = 1;
+				$this->inDatabase = TRUE;
 				return TRUE;
 			}
 			else
@@ -122,7 +129,7 @@ class Fleet {
 		}
 		else {
 			$stmt = $conn->prepare('UPDATE fleet SET allianceId=?, name=?, added=? WHERE id=?');
-			$stmt->bind_param('issi', $this->AllianceId, $this->Name, DataManager::FormatTimestampForSql($this->Added), $this->Id);
+			$stmt->bind_param('issd', $this->AllianceId, $this->Name, DataManager::FormatTimestampForSql($this->Added), $this->Id);
 			$stmt->execute();
 			$rows = $stmt->affected_rows;
 			$stmt->close();
@@ -137,7 +144,7 @@ class Fleet {
 	// Returns TRUE if the Fleet is valid and ready to be
 	// saved to the database.
 	public function Validate() {
-		if (!isset($this->Id) || !is_int($this->Id))
+		if (!isset($this->Id) || !is_float($this->Id))
 			return FALSE;
 		if (!isset($this->AllianceId) || !is_int($this->AllianceId))
 			return FALSE;

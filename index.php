@@ -40,7 +40,7 @@ function printAllianceFleets($name, $fleets, $myFleet = TRUE) {
 		echo ' ';
 		if ($myFleet) {
 			echo '<a href="gang:' . $f->Id . '">' . htmlspecialchars($f->Name) . '</a>';
-			echo ' <a href="Delete.php?id=' . $f->Id . '">[Delete]</a>';
+			echo ' <a href="DeleteFleet.php?id=' . $f->Id . '">[Delete]</a>';
 		}
 		else
 			echo htmlspecialchars($f->Name);
@@ -60,9 +60,10 @@ function printAllianceFleets($name, $fleets, $myFleet = TRUE) {
 	echo '<h2><font color="red">This page is designed to be viewed in the EVE in-game browser.</font></h2>';
 }
 elseif ($notTrusted) { 
-	echo '<h2><font color="red">You must add this site to your trusted site list.</font></h2>';
+	echo '<h2><font color="red">You must add this site to your trusted site list. <a href="MakeTrusted.html">Instructions here.</a></font></h2>';
 }
 elseif ($trusted) {
+	echo '<a href="AddFleet.php">Add a fleet</a><br>';
 	printAllianceFleets(htmlspecialchars($brow->AllianceName()), $myFleets);
 }
 

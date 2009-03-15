@@ -9,13 +9,13 @@ class Alliance {
 	public $Id;
 	public $Name;
 
-	private $inDatabase = 0;
+	private $inDatabase = FALSE;
 		
 	// fills a Alliance object with data from mysql
 	private static function fill(&$a, $id, $name) {
 		$a->Id = (int)$id;
 		$a->Name = $name;
-		$a->inDatabase = 1;
+		$a->inDatabase = TRUE;
 	}
 
 	// returns the alliance with the given id.
@@ -105,14 +105,14 @@ class Alliance {
 		if (!$this->Validate())
 			throw new Exception('Alliance not valid; unable to save.');
 		$conn = DataManager::GetConnection();
-		if ($this->inDatabase == 0) {
+		if (!$this->inDatabase) {
 			$stmt = $conn->prepare('INSERT INTO alliance (id, name) VALUES (?, ?)');
 			$stmt->bind_param('is', $this->Id, $this->Name);
 			$stmt->execute();
 			$rows = $stmt->affected_rows;
 			$stmt->close();
 			if ($rows === 1) {
-				$this->inDatabase = 1;
+				$this->inDatabase = TRUE;
 				return TRUE;
 			}
 			else
