@@ -79,7 +79,7 @@ class Fleet {
 	
 	public static function DeleteOldFleets() {
 		$conn = DataManager::GetConnection();
-		$stmt = $conn->prepare('DELETE fleet WHERE added < ?');
+		$stmt = $conn->prepare('DELETE FROM fleet WHERE added < ?');
 		$stmt->bind_param('s', DataManager::FormatTimestampForSql(LastDowntimeMidpoint()));
 		$stmt->execute();
 		$stmt->close();
