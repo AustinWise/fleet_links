@@ -12,13 +12,11 @@ if (!($brow->IsIGB() && $brow->IsTrusted()))
 if (isset($_POST['fleetLink']) && isset($_POST['name'])){
 	$matches;
 	if (preg_match('/gang:(?<id>\d+)/', GetPost('fleetLink'), $matches)) {
-		$id = (float)$matches['id'];
-		$name = GetPost('name');
 		$a = Alliance::EnsureAlliance($brow->AllianceId(), $brow->AllianceName());
 		$f = new Fleet();
-		$f->Id = $id;
+		$f->Id = $matches['id'];
 		$f->AllianceId = $a->Id;
-		$f->Name = $name;
+		$f->Name = GetPost('name');
 		$f->Added = time();
 		if ($f->Validate()) {
 			$f->Save();

@@ -4,7 +4,8 @@ class Fleet {
 	function __construct() {
 	}
 	
-	//$Id is a float, as fleet ids are very large.
+	// $Id is an integer, but it is stored as a string since it won't fit in int
+	// and when converted to a float sometimes it does not convert correctly
 	public $Id;
 	public $AllianceId;
 	public $Name;
@@ -13,12 +14,8 @@ class Fleet {
 	private $inDatabase = FALSE;
 	
 	public static function Get($id) {
-		if (!(is_float($id))) {
-			throw new Exception("id was not an int.");
-		}
-
 		$conn = DataManager::GetConnection();
-		$stmt = $conn->prepare('SELECT id, allianceid, name, added FROM fleet WHERE id = ?');
+		$stmt = $conn->prepare('SELECT id, allianceId, name, added FROM fleet WHERE id = ?');
 		$stmt->bind_param('d', $id);
 		$stmt->execute();
 		$stmt->bind_result($id, $allianceId, $name, $added);
@@ -37,7 +34,7 @@ class Fleet {
 	
 	// fills a Fleet object with data from mysql
 	private static function fill(&$f, $id, $allianceId, $name, $added) {
-		$f->Id = (float)$id;
+		$f->Id = $id;
 		$f->AllianceId = (int)$allianceId;
 		$f->Name = $name;
 		$f->Added = strtotime($added);
@@ -46,7 +43,7 @@ class Fleet {
 
 	// Returns array contain all the Fleets.
 	public static function GetAll() {
-		$query = DataManager::Query("SELECT * FROM fleet");
+		$query = DataManager::Query("SELECT id, allianceId, name, added FROM fleet");
 		$items = array();
 		while ($assoc = $query->fetch_assoc()) {
 			$f = new Fleet();
@@ -89,10 +86,6 @@ class Fleet {
 	}
 	
 	public static function DeleteFleet($id) {
-		if (!is_float($id)) {
-			throw new Exception("id was not an int.");
-		}
-
 		$conn = DataManager::GetConnection();
 		$stmt = $conn->prepare('DELETE FROM fleet WHERE id = ?');
 		$stmt->bind_param('d', $id);
@@ -144,7 +137,7 @@ class Fleet {
 	// Returns TRUE if the Fleet is valid and ready to be
 	// saved to the database.
 	public function Validate() {
-		if (!isset($this->Id) || !is_float($this->Id))
+		if (!isset($this->Id) || !preg_match('/^\d+$/', $this->Id))
 			return FALSE;
 		if (!isset($this->AllianceId) || !is_int($this->AllianceId))
 			return FALSE;

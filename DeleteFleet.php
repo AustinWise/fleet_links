@@ -11,11 +11,7 @@ if (!($brow->IsIGB() && $brow->IsTrusted()))
 if (!isset($_GET['id']))
 	RedirectResponse('index.php');
 
-$id = (float)(GetGet('id'));
-
-// $id will be 0 if a non-number was passed in.
-if ($id == 0)
-	RedirectResponse('index.php');
+$id = (GetGet('id'));
 
 $f;
 try {
