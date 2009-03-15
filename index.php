@@ -36,7 +36,7 @@ DataManager::CloseConnection();
 function printAllianceFleets($name, $fleets, $myFleet = TRUE) {
 	echo '<h2>' . $name . '</h2>';
 	foreach ($fleets as $f) {
-		echo gmdate('H:m', $f->Added);
+		echo gmdate('H:i', $f->Added);
 		echo ' ';
 		if ($myFleet) {
 			echo '<a href="gang:' . $f->Id . '">' . htmlspecialchars($f->Name) . '</a>';
