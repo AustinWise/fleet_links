@@ -20,12 +20,15 @@ if (isset($_POST['fleetLink']) && isset($_POST['name'])){
 		$f->Added = time();
 		if ($f->Validate()) {
 			$f->Save();
+			
+			// this seems like a good place to delete old fleets
+			Fleet::DeleteOldFleets();
+
+         DataManager::CloseConnection();
 			RedirectResponse('index.php');
 		}
 	}
 }
-
-DataManager::CloseConnection();
 
 ?>
 
