@@ -13,11 +13,11 @@ into config.php.
 Limitations
 
 The site assumes anyone using it is in an alliance.  Any fleet added by someone
-in a non-alliance corporation gets grouped in the “None” alliance.
+in a non-alliance corporation gets grouped in the "None" alliance.
 
 Security
 
-While the site does prevent players from deleting other alliance’s fleets, this
+While the site does prevent players from deleting other alliance's fleets, this
 provides minimal protection.
 
 Ideas for more features

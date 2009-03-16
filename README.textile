@@ -8,11 +8,11 @@ You need a web server with PHP and a database server running MySql.  Use @databa
 
 h2. Limitations
 
-The site assumes anyone using it is in an alliance.  Any fleet added by someone in a non-alliance corporation gets grouped in the “None” alliance.
+The site assumes anyone using it is in an alliance.  Any fleet added by someone in a non-alliance corporation gets grouped in the "None" alliance.
 
 h2. Security
 
-While the site does prevent players from deleting other alliance’s fleets, this provides minimal protection.
+While the site does prevent players from deleting other alliance's fleets, this provides minimal protection.
 
 h2. Ideas for more features
 
