@@ -7,7 +7,7 @@ require_once('app_code/DataManager.php');
 
 $brow = EveBowserFactory::Get();
 if (!($brow->IsIGB() && $brow->IsTrusted()))
-	RedirectResponse('index.php');
+	RedirectResponse('links.php');
 
 if (isset($_POST['fleetLink']) && isset($_POST['name'])){
 	$matches;
@@ -25,7 +25,7 @@ if (isset($_POST['fleetLink']) && isset($_POST['name'])){
 			Fleet::DeleteOldFleets();
 
          DataManager::CloseConnection();
-			RedirectResponse('index.php');
+			RedirectResponse('links.php');
 		}
 	}
 }

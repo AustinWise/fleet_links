@@ -6,10 +6,10 @@ require_once('app_code/DataManager.php');
 
 $brow = EveBowserFactory::Get();
 if (!($brow->IsIGB() && $brow->IsTrusted()))
-	RedirectResponse('index.php');
+	RedirectResponse('links.php');
 
 if (!isset($_GET['id']))
-	RedirectResponse('index.php');
+	RedirectResponse('links.php');
 
 $id = (GetGet('id'));
 
@@ -18,17 +18,17 @@ try {
 	$f = Fleet::Get($id);
 }
 catch (Exception $ex) {
-	RedirectResponse('index.php');
+	RedirectResponse('links.php');
 }
 
 // you are only allowed to delete your own alliances fleet.
 if ($f->AllianceId != $brow->AllianceId())
-	RedirectResponse('index.php');
+	RedirectResponse('links.php');
 
 // delete the fleet if the button was pressed.
 if (isset($_POST['btnDelete'])) {
 	$f->Delete();
-	RedirectResponse('index.php');	
+	RedirectResponse('links.php');	
 }
 
 DataManager::CloseConnection();
