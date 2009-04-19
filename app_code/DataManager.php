@@ -2,38 +2,45 @@
 require_once ("config.php");
 
 class DataManager {
-	public static function GetConnection($createIfNull = TRUE) {
-		static $conn;
-		if (isset($conn) || !$createIfNull)
-			return $conn;
+  private static $instance = null;
+  public static function GetInstance() {
+    if (self::$instance == null) {
+      self::$instance = new DataManager();
+    }
+    return self::$instance;
+  }
 
+  private $conn;
+  
+  private function __construct() {
 		global $cfg;
 		$server = $cfg['db']['server'];
 		$username = $cfg['db']['username'];
 		$password = $cfg['db']['password'];
 		$database = $cfg['db']['database'];
 		
-		$conn = new mysqli($server, $username, $password, $database);
+		$this->conn = new mysqli($server, $username, $password, $database);		
 		
-		if ($conn->connect_error)
+		if ($this->conn->connect_error)
 			throw new Exception('Failed to connect to the database.');
-		
-		return $conn;
+  }
+	
+	public function CloseConnection() {
+		if (isset($this->conn)) {
+			$this->conn->close();
+		}
 	}
 	
-	public static function CloseConnection() {
-		$conn = DataManager::GetConnection(FALSE);
-		if (isset($conn))
-			$conn->close();
+	public function GetConnection() {
+    return $this->conn;
 	}
 	
-	public static function Query($query) {
-		$conn = DataManager::GetConnection();
-		return $conn->query($query);
+	public function Query($query) {
+		return $this->conn->query($query);
 	}
 	
-	public static function QueryAndFetch($query) {
-		$result = DataManager::Query($query);
+	public function QueryAndFetch($query) {
+		$result = $this->Query($query);
 		if ($result) {
 			$assoc = $result->fetch_assoc();
 			$result->close();
@@ -44,12 +51,11 @@ class DataManager {
 		}
 	}
 	
-	public static function EscapeString($str) {
-		$conn = DataManager::GetConnection();
-		return $conn->real_escape_string($str);
+	public function EscapeString($str) {
+		return $this->conn->real_escape_string($str);
 	}
 	
-	public static function FormatTimestampForSql($time) {
+	public function FormatTimestampForSql($time) {
 		return date('Y-m-d H:i:s', $time);
 	}
 }

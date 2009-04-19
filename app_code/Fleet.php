@@ -14,7 +14,7 @@ class Fleet {
 	private $inDatabase = FALSE;
 	
 	public static function Get($id) {
-		$conn = DataManager::GetConnection();
+		$conn = DataManager::GetInstance()->GetConnection();
 		$stmt = $conn->prepare('SELECT id, allianceId, name, added FROM fleet WHERE id = ?');
 		$stmt->bind_param('d', $id);
 		$stmt->execute();
@@ -43,7 +43,7 @@ class Fleet {
 
 	// Returns array contain all the Fleets.
 	public static function GetAll() {
-		$query = DataManager::Query("SELECT id, allianceId, name, added FROM fleet");
+		$query = DataManager::GetInstance()->Query("SELECT id, allianceId, name, added FROM fleet");
 		$items = array();
 		while ($assoc = $query->fetch_assoc()) {
 			$f = new Fleet();
@@ -59,7 +59,7 @@ class Fleet {
 			throw new Exception("allianceId was not an int.");
 		}
 		
-		$conn = DataManager::GetConnection();
+		$conn = DataManager::GetInstance()->GetConnection();
 		$stmt = $conn->prepare('SELECT id, allianceid, name, added FROM fleet WHERE added > ? AND allianceid = ?');
 		$stmt->bind_param('si', DataManager::FormatTimestampForSql(LastDowntimeMidpoint()), $allianceId);
 		$stmt->execute();
@@ -78,15 +78,15 @@ class Fleet {
 	}
 	
 	public static function DeleteOldFleets() {
-		$conn = DataManager::GetConnection();
+		$conn = DataManager::GetInstance()->GetConnection();
 		$stmt = $conn->prepare('DELETE FROM fleet WHERE added < ?');
-		$stmt->bind_param('s', DataManager::FormatTimestampForSql(LastDowntimeMidpoint()));
+		$stmt->bind_param('s', DataManager::GetInstance()->FormatTimestampForSql(LastDowntimeMidpoint()));
 		$stmt->execute();
 		$stmt->close();
 	}
 	
 	public static function DeleteFleet($id) {
-		$conn = DataManager::GetConnection();
+		$conn = DataManager::GetInstance()->GetConnection();
 		$stmt = $conn->prepare('DELETE FROM fleet WHERE id = ?');
 		$stmt->bind_param('d', $id);
 		$stmt->execute();
@@ -106,7 +106,7 @@ class Fleet {
 	public function Save() {
 		if (!$this->Validate())
 			throw new Exception('Fleet not valid; unable to save.');
-		$conn = DataManager::GetConnection();
+		$conn = DataManager::GetInstance()->GetConnection();
 		if (!$this->inDatabase) {
 			$stmt = $conn->prepare('INSERT INTO fleet (id, allianceId, name, added) VALUES (?, ?, ?, ?)');
 			$stmt->bind_param('diss', $this->Id, $this->AllianceId, $this->Name, DataManager::FormatTimestampForSql($this->Added));

@@ -31,7 +31,7 @@ if (isset($_POST['btnDelete'])) {
 	RedirectResponse('links.php');	
 }
 
-DataManager::CloseConnection();
+DataManager::GetInstance()->CloseConnection();
 
 ?>
 

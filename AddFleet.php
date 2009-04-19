@@ -24,7 +24,7 @@ if (isset($_POST['fleetLink']) && isset($_POST['name'])){
 			// this seems like a good place to delete old fleets
 			Fleet::DeleteOldFleets();
 
-         DataManager::CloseConnection();
+      DataManager::GetInstance()->CloseConnection();
 			RedirectResponse('links.php');
 		}
 	}

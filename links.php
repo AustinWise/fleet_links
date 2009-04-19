@@ -31,7 +31,7 @@ if ($trusted) {
 }
 
 
-DataManager::CloseConnection();
+DataManager::GetInstance()->CloseConnection();
 
 function printAllianceFleets($name, $fleets, $myFleet = TRUE) {
 	echo '<h2>' . $name . '</h2>';

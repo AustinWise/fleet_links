@@ -25,7 +25,7 @@ class Alliance {
 			throw new Exception("id was not an int.");
 		}
 		
-		$conn = DataManager::GetConnection();
+		$conn = DataManager::GetInstance()->GetConnection();
 		$stmt = $conn->prepare('SELECT id, name FROM alliance WHERE id = ?');
 		$stmt->bind_param('i', $id);
 		$stmt->execute();
@@ -45,7 +45,7 @@ class Alliance {
 	
 	// Returns array contain all the Alliances.
 	public static function GetAll() {
-		$query = DataManager::Query("SELECT id, name FROM alliance");
+		$query = DataManager::GetInstance()->Query("SELECT id, name FROM alliance");
 		$items = array();
 		while ($assoc = $query->fetch_assoc()) {
 			$a = new Alliance();
@@ -76,9 +76,9 @@ class Alliance {
 			throw new Exception("myAllianceId was not an int.");
 		}
 		
-		$conn = DataManager::GetConnection();
+		$conn = DataManager::GetInstance()->GetConnection();
 		$stmt = $conn->prepare('SELECT id, name FROM alliance WHERE id in (SELECT allianceId FROM fleet WHERE added > ?) AND id != ?');
-		$stmt->bind_param('si', DataManager::FormatTimestampForSql(LastDowntimeMidpoint()), $myAllianceId);
+		$stmt->bind_param('si', DataManager::GetInstance()->FormatTimestampForSql(LastDowntimeMidpoint()), $myAllianceId);
 		$stmt->execute();
 		$stmt->bind_result($id, $name);
 		
@@ -104,7 +104,7 @@ class Alliance {
 	public function Save() {
 		if (!$this->Validate())
 			throw new Exception('Alliance not valid; unable to save.');
-		$conn = DataManager::GetConnection();
+		$conn = DataManager::GetInstance()->GetConnection();
 		if (!$this->inDatabase) {
 			$stmt = $conn->prepare('INSERT INTO alliance (id, name) VALUES (?, ?)');
 			$stmt->bind_param('is', $this->Id, $this->Name);
