@@ -1,6 +1,6 @@
 <?php
 
-class Default_Model_AllianceMapper {
+class Default_Model_FleetMapper {
   protected $_dbTable;
   
   public function setDbTable($dbTable) {
@@ -16,17 +16,17 @@ class Default_Model_AllianceMapper {
   
   public function getDbTable() {
     if ($this->_dbTable === null) {
-      $this->setDbTable('Default_Model_DbTable_Alliance');
+      $this->setDbTable('Default_Model_DbTable_Fleet');
     }
     return $this->_dbTable;
   }
   
-  public function save(Default_Model_Alliance $alliance) {
+  public function save(Default_Model_Fleet $Fleet) {
     $data = array(
-      'name' => $alliance->getName()
+      'name' => $Fleet->getName()
     );
     
-    if (($id = $alliance->getId()) === null) {
+    if (($id = $Fleet->getId()) === null) {
       $this->getDbTable()->insert($data);
     }
     else {
@@ -34,13 +34,14 @@ class Default_Model_AllianceMapper {
     }
   }
   
-  public function find($id, Default_Model_Alliance $alliance) {
+  public function find($id, Default_Model_Fleet $Fleet) {
     $result = $this->getDbTable()->find($id);
     if (count($result) == 0) {
       return;
     }
     $row = $result->current();
     $guestbook->setId($row->id)
+              ->setAllianceId($row->allianceId)
               ->setName($row->name);
   }
   
@@ -48,8 +49,9 @@ class Default_Model_AllianceMapper {
     $resultSet = $this->getDbTable()->fetchAll();
     $entries = array();
     foreach ($resultSet as $row) {
-      $entry = new Default_Model_Alliance();
+      $entry = new Default_Model_Fleet();
       $entry->setId($row->id)
+            ->setAllianceId($row->allianceId)
             ->setName($row->name)
             ->setMapper($this);
       $entries[] = $entry;
