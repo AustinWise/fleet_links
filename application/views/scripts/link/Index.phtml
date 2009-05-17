@@ -1,0 +1,8 @@
+main page
+<dl>
+    <!-- Loop through the entries that were provided to us by the controller -->
+    <?php foreach ($this->entries as $entry): ?>
+    <dt><?php echo $this->escape($entry->getId()) ?></dt>
+    <dd><?php echo $this->escape($entry->getName()) ?></dd>
+    <?php endforeach ?>
+</dl>
