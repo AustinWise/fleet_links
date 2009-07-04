@@ -34,19 +34,34 @@ class Default_Model_FleetMapper {
     }
   }
   
-  public function find($id, Default_Model_Fleet $Fleet) {
+  public function find($id, Default_Model_Fleet $fleet) {
     $result = $this->getDbTable()->find($id);
     if (count($result) == 0) {
       return;
     }
     $row = $result->current();
-    $guestbook->setId($row->id)
-              ->setAllianceId($row->allianceId)
-              ->setName($row->name);
+    $fleet->setId($row->id)
+          ->setAllianceId($row->allianceId)
+          ->setName($row->name);
   }
   
   public function fetchAll() {
     $resultSet = $this->getDbTable()->fetchAll();
+    $entries = array();
+    foreach ($resultSet as $row) {
+      $entry = new Default_Model_Fleet();
+      $entry->setId($row->id)
+            ->setAllianceId($row->allianceId)
+            ->setName($row->name)
+            ->setMapper($this);
+      $entries[] = $entry;
+    }
+    return $entries;
+  }
+  
+  public function getFleetsForAlliance($allianceId) {
+    $table = $this->getDbTable();
+    $resultSet = $table->fetchAll($table->select()->where('allianceId = ?', $allianceId));
     $entries = array();
     foreach ($resultSet as $row) {
       $entry = new Default_Model_Fleet();

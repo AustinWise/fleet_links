@@ -79,6 +79,10 @@ class Default_Model_Fleet {
     return $this->getMapper()->fetchAll();
   }
   
+  public function getFleetsForAlliance($allianceId) {
+    return $this->getMapper()->getFleetsForAlliance($allianceId);
+  }
+  
 }
 
 ?>

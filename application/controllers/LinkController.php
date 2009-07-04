@@ -23,7 +23,35 @@ class LinkController extends Zend_Controller_Action
      */
     public function indexAction() 
     {
-      $alliance = new Default_Model_Alliance();
-      $this->view->entries = $alliance->fetchAll();
+        $fleet = new Default_Model_Fleet();
+        $this->view->entries = $fleet->getFleetsForAlliance(824518128);
+    }
+    
+    public function addAction() 
+    {
+        $form    = new Default_Form_Fleet();
+        // Check to see if this action has been POST'ed to.
+        if ($this->getRequest()->isPost()) {
+
+            // Now check to see if the form submitted exists, and
+            // if the values passed in are valid for this form.
+            if ($form->isValid($request->getPost())) {
+
+                // Since we now know the form validated, we can now
+                // start integrating that data sumitted via the form
+                // into our model:
+                $model = new Default_Model_Fleet($form->getValues());
+                $model->save();
+
+                // Now that we have saved our model, lets url redirect
+                // to a new location.
+                // This is also considered a "redirect after post";
+                // @see http://en.wikipedia.org/wiki/Post/Redirect/Get
+                return $this->_helper->redirector('index');
+            }
+        }
+        $this->view->form = $form;
+        //$fleet = new Default_Model_Fleet();
+        //$this->view->entries = $fleet->getFleetsForAlliance(824518128);
     }
 }

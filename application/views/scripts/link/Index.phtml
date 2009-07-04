@@ -4,5 +4,6 @@ main page
     <?php foreach ($this->entries as $entry): ?>
     <dt><?php echo $this->escape($entry->getId()) ?></dt>
     <dd><?php echo $this->escape($entry->getName()) ?></dd>
+    <dd><?php echo $this->escape($entry->getAllianceId()) ?></dd>
     <?php endforeach ?>
 </dl>

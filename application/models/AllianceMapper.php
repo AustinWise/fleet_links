@@ -40,8 +40,9 @@ class Default_Model_AllianceMapper {
       return;
     }
     $row = $result->current();
-    $guestbook->setId($row->id)
-              ->setName($row->name);
+    $alliance->setId($row->id)
+             ->setName($row->name)
+             ->setMapper($this);
   }
   
   public function fetchAll() {

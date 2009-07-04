@@ -4,7 +4,11 @@ In EVE Online, forming up large fleets and keeping up with requests to join exis
 
 h2. Installation
 
-You need a web server with PHP and a database server running MySql.  Use @database.sql@ to create the tables and put your database connection information into @config.php@.
+Fleet Links is tested to work with both IIS7, Apache, and lighttpd.  You will need PHP installed on your web/app server.  Use @database.sql@ to create the tables in your MySQL server.
+
+h3. Special Insturctions for IIS7
+
+You will also need the "URL Rewrite Module for IIS 7":http://blogs.iis.net/ruslany/archive/2009/04/20/url-rewrite-module-1-1-for-iis-7.aspx .
 
 h2. Limitations
 
