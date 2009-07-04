@@ -1,0 +1,10 @@
+Fleet Links ASP.NET version
+
+This is the orginal version of fleet links.  It is no longer being
+activly worked on.
+
+What's with the Fleet table?
+
+I had some different ideas on how fleet deletion should work.  The
+DeletePassword and IsDeleted columns are no longer needed, but I have
+not gotten around to removing them.
