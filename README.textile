@@ -1,3 +1,9 @@
+h1. WARNING
+
+Just in case you didn't notice, this version (the zend framework one) is not complete.
+Not that it really matters, as this whole program is pretty useless since the fleet finder was
+added to EVE.
+
 h1. Fleet Links
 
 In EVE Online, forming up large fleets and keeping up with requests to join existing fleets has always been a chore.  The Trinity 1.1 patch helped by adding the ability to post a links in chat channels that let anyone in the alliance join.  Fleet Links takes these links and stores them in a website so your alliance mates merely have to open the in-game browser (IGB) to get into fleet.
